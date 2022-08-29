@@ -10,6 +10,6 @@ public interface TopicoRepository extends JpaRepository<Topico, Long> {
 
 	List<Topico> findByTitulo(String nomeCurso);
 
-	List<Topico> findByCursoNomeIgnoreCaseStartingWith(String nomeCurso);
+	List<Topico> findByCursoNomeStartingWithIgnoreCase(String nomeCurso);
 
 }

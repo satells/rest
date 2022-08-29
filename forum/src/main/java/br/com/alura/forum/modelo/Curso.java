@@ -14,6 +14,13 @@ public class Curso {
 	private String nome;
 	private String categoria;
 
+	public Curso() {
+	}
+
+	public Curso(String nome) {
+		this.nome = nome;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
