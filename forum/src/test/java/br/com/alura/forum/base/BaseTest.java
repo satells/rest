@@ -10,7 +10,6 @@ import br.com.alura.forum.ForumApplication;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = { ForumApplication.class })
 @AutoConfigureMockMvc
-
 public class BaseTest {
 	@Autowired
 	protected MockMvc mockMvc;

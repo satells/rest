@@ -1,5 +1,6 @@
 package br.com.alura.forum.controller.form;
 
+import org.hibernate.validator.constraints.Length;
 import org.springframework.stereotype.Component;
 
 import br.com.alura.forum.modelo.Curso;
@@ -9,8 +10,11 @@ import br.com.alura.forum.repository.CursoRepository;
 @Component
 public class TopicoForm {
 
+	@Length(min = 5, message = "Mínimo de 5 caracteres")
 	private String titulo;
+	@Length(min = 5)
 	private String mensagem;
+	@Length(min = 5)
 	private String nomeCurso;
 
 	public TopicoForm() {

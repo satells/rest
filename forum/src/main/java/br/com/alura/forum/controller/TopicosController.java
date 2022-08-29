@@ -3,6 +3,8 @@ package br.com.alura.forum.controller;
 import java.net.URI;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseEntity.BodyBuilder;
@@ -22,28 +24,28 @@ import br.com.alura.forum.repository.TopicoRepository;
 public class TopicosController {
 
 	@Autowired
-	private TopicoRepository repository;
+	private TopicoRepository topicoRepository;
 
 	@Autowired
 	private CursoRepository cursoRepository;
 
 	@GetMapping
 	public List<TopicoDto> lista(String nomeCurso) {
-
+		System.out.println(nomeCurso);
 		List<Topico> topicos = null;
 		if (nomeCurso == null) {
-			topicos = repository.findAll();
+			topicos = topicoRepository.findAll();
 		} else {
-			topicos = repository.findByCursoNomeStartingWithIgnoreCase(nomeCurso);
+			topicos = topicoRepository.findByCursoNomeStartingWithIgnoreCase(nomeCurso);
 		}
 
 		return TopicoDto.converter(topicos);
 	}
 
 	@PostMapping
-	public ResponseEntity<TopicoDto> cadastrar(@RequestBody TopicoForm topicoForm, UriComponentsBuilder uriBuilder) {
+	public ResponseEntity<TopicoDto> cadastrar(@RequestBody @Valid TopicoForm topicoForm, UriComponentsBuilder uriBuilder) {
 		Topico topico = topicoForm.converter(cursoRepository);
-		repository.save(topico);
+		topicoRepository.save(topico);
 
 		UriComponentsBuilder path = uriBuilder.path("/topicos/{id}");
 		URI uri = path.buildAndExpand(topico.getId()).toUri();
@@ -52,5 +54,14 @@ public class TopicosController {
 
 		return bodyBuilder.body(new TopicoDto(topico));
 	}
+
+//	@GetMapping("/{id}")
+//	public DetalhesDoTopicoDto detalhar(@PathVariable Long id) {
+//		System.out.println(id);
+//
+//		Topico topico = topicoRepository.getOne(id);
+//
+//		return new DetalhesDoTopicoDto(topico);
+//	}
 
 }

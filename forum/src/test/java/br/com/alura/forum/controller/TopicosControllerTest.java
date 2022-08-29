@@ -1,11 +1,13 @@
 package br.com.alura.forum.controller;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -24,42 +26,80 @@ class TopicosControllerTest extends BaseTest {
 
 		mockMvc.perform(requestBuilder)
 
-				.andExpect(MockMvcResultMatchers.status().is2xxSuccessful())
+				.andExpect(status().is2xxSuccessful())
 
-				.andExpect(MockMvcResultMatchers.content().contentType("application/json;charset=UTF-8"))
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
 
 		;
 	}
 
 	@Test
 	void test_post() throws Exception {
-		TopicoForm topicoForm = new TopicoForm("Dúvida Postman", "Texto da mensagem", "Spring Boot");
 
-		ObjectMapper objectMapper = new ObjectMapper();
-
-		String topico = objectMapper.writeValueAsString(topicoForm);
+		String topico = new ObjectMapper().writeValueAsString(new TopicoForm("Dúvida Postman", "Texto da mensagem", "Spring Boot"));
 
 		MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
 
 				.post("/topicos")
 
-				.accept(MediaType.APPLICATION_JSON_UTF8_VALUE)
+				.accept(APPLICATION_JSON_UTF8_VALUE)
 
 				.content(topico)
 
-				.contentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
+				.contentType(APPLICATION_JSON_UTF8_VALUE);
 
 		mockMvc.perform(requestBuilder)
 
-				.andExpect(MockMvcResultMatchers.status().isCreated())
+				.andExpect(status().isCreated())
 
-				.andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+				.andExpect(content().contentType(APPLICATION_JSON_UTF8_VALUE))
 
-				.andExpect(jsonPath("$", Matchers.notNullValue()))
+				.andExpect(MockMvcResultMatchers.redirectedUrlPattern("http://**/topicos/*"))
 
-				.andExpect(jsonPath("$.titulo", is("Dúvida Postman_")))
+				.andExpect(jsonPath("$", notNullValue()))
+
+				.andExpect(jsonPath("$.id", notNullValue()))
+
+				.andExpect(jsonPath("$.titulo", is("Dúvida Postman")))
+
+				.andExpect(jsonPath("$.mensagem", is("Texto da mensagem")))
+
+				.andExpect(jsonPath("$.dataCriacao", notNullValue()));
+
+	}
+
+	@Test
+	void test_post_with_error_on_validation() throws Exception {
+		String topico = new ObjectMapper().writeValueAsString(new TopicoForm("", "Texto da mensagem", "Spring Boot"));
+
+		MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+
+				.post("/topicos")
+
+				.accept(APPLICATION_JSON_UTF8_VALUE)
+
+				.header("Accept-Language", "pt-BR")
+
+				.content(topico)
+
+				.contentType(APPLICATION_JSON_UTF8_VALUE);
 
 		;
+
+		mockMvc.perform(requestBuilder)
+
+				.andExpect(content().contentType(APPLICATION_JSON_UTF8_VALUE))
+
+				.andExpect(status().is4xxClientError())
+
+				.andExpect(jsonPath("$", notNullValue()))
+
+				.andExpect(jsonPath("$[0].campo", is("titulo")))
+
+				.andExpect(jsonPath("$[0].erro", is("Mínimo de 5 caracteres")))
+
+		;
+
 	}
 
 }
