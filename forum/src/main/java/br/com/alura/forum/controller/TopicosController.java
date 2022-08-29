@@ -9,11 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import br.com.alura.forum.controller.dto.DetalhesDoTopicoDto;
 import br.com.alura.forum.controller.dto.TopicoDto;
 import br.com.alura.forum.controller.form.TopicoForm;
 import br.com.alura.forum.modelo.Topico;
@@ -30,14 +32,9 @@ public class TopicosController {
 	private CursoRepository cursoRepository;
 
 	@GetMapping
-	public List<TopicoDto> lista(String nomeCurso) {
-		System.out.println(nomeCurso);
-		List<Topico> topicos = null;
-		if (nomeCurso == null) {
-			topicos = topicoRepository.findAll();
-		} else {
-			topicos = topicoRepository.findByCursoNomeStartingWithIgnoreCase(nomeCurso);
-		}
+	public List<TopicoDto> lista() {
+//		List<Topico> topicos = topicoRepository.findByCursoNomeStartingWithIgnoreCase("Spring");
+		List<Topico> topicos = topicoRepository.findAll();
 
 		return TopicoDto.converter(topicos);
 	}
@@ -55,13 +52,13 @@ public class TopicosController {
 		return bodyBuilder.body(new TopicoDto(topico));
 	}
 
-//	@GetMapping("/{id}")
-//	public DetalhesDoTopicoDto detalhar(@PathVariable Long id) {
-//		System.out.println(id);
-//
-//		Topico topico = topicoRepository.getOne(id);
-//
-//		return new DetalhesDoTopicoDto(topico);
-//	}
+	@GetMapping("/codigo/{id}")
+	public DetalhesDoTopicoDto detalhar(@PathVariable Long id) {
+		System.out.println(id);
+
+		Topico topico = topicoRepository.getOne(id);
+
+		return new DetalhesDoTopicoDto(topico);
+	}
 
 }
