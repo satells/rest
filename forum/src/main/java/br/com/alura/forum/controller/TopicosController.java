@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,7 +44,13 @@ public class TopicosController {
 	public ResponseEntity<TopicoDto> cadastrar(@RequestBody TopicoForm topicoForm, UriComponentsBuilder uriBuilder) {
 		Topico topico = topicoForm.converter(cursoRepository);
 		repository.save(topico);
-		URI uri = uriBuilder.path("/topicos/{id}").buildAndExpand(topico.getId()).toUri();
-		return ResponseEntity.created(uri).body(new TopicoDto(topico));
+
+		UriComponentsBuilder path = uriBuilder.path("/topicos/{id}");
+		URI uri = path.buildAndExpand(topico.getId()).toUri();
+
+		BodyBuilder bodyBuilder = ResponseEntity.created(uri);
+
+		return bodyBuilder.body(new TopicoDto(topico));
 	}
+
 }
